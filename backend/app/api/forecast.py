@@ -1,4 +1,5 @@
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from app.core.db_retry import DatabaseUnavailable
 from app.core.security import get_current_user
 from app.core.database import get_supabase_admin
 from app.schemas.behavioral import ForecastResponse, MoodCheckinRequest, DayForecast
@@ -13,7 +14,12 @@ router = APIRouter(prefix="/api/forecast", tags=["Forecast"])
 @router.get("/3day", response_model=ForecastResponse)
 async def get_3day_forecast(current: dict = Depends(get_current_user)):
     db = get_supabase_admin()
-    return await get_forecast_for_user(current["sub"], db)
+    try:
+        return await get_forecast_for_user(current["sub"], db)
+    except DatabaseUnavailable:
+        # Real outage after retries: tell the client to try again; do not fabricate a forecast.
+        raise HTTPException(status_code=503, detail="Forecast temporarily unavailable, please retry shortly",
+                            headers={"Retry-After": "5"})
 
 
 @router.post("/checkin", status_code=201)

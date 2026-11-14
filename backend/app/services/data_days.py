@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 
+from app.core.db_retry import TRANSIENT_ERRORS
+
+
 def count_data_days(db, uid: str) -> int:
     """
     Preferred: the `count_data_days` SQL function (migration 003) — exact and cheap.
@@ -16,6 +19,8 @@ def count_data_days(db, uid: str) -> int:
         if isinstance(val, dict):
             val = next(iter(val.values()), 0)
         return int(val or 0)
+    except TRANSIENT_ERRORS:
+        raise                                 # let the caller retry / report the outage
     except Exception:
         pass
 

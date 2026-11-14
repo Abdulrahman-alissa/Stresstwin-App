@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.security import get_current_user
 from app.core.database import get_supabase_admin
+from app.core.db_retry import first_row
 from app.schemas.behavioral import DeviceRegisterRequest, DeviceOut, DeviceHeartbeatRequest, DeviceStatsResponse
 from app.services.device_stats import compute_device_stats, LOG_COLUMNS
 
@@ -40,35 +41,31 @@ async def register_device(body: DeviceRegisterRequest, current: dict = Depends(g
     uid = current["sub"]
     db = get_supabase_admin()
 
-    existing = (
-        db.table("devices")
-        .select("*")
-        .eq("user_id", uid)
-        .eq("device_id", body.device_id)
-        .maybe_single()
-        .execute()
-    )
-
-    if existing is not None and existing.data:
-        row = (
-            db.table("devices")
-            .update({"platform": body.platform, "display_name": body.display_name})
-            .eq("id", existing.data["id"])
-            .execute()
-        )
-        return _to_out(row.data[0])
-
+    # One atomic upsert on the table's UNIQUE (user_id, device_id) constraint: a first launch inserts,
+    # later launches update platform/display_name only (keyboard_active and timestamps are untouched),
+    # and two simultaneous launches cannot create two rows.
     row = (
         db.table("devices")
-        .insert({
-            "user_id": uid,
-            "device_id": body.device_id,
-            "platform": body.platform,
-            "display_name": body.display_name,
-        })
+        .upsert(
+            {
+                "user_id": uid,
+                "device_id": body.device_id,
+                "platform": body.platform,
+                "display_name": body.display_name,
+            },
+            on_conflict="user_id,device_id",
+        )
         .execute()
     )
-    return _to_out(row.data[0])
+    data = row.data
+    if not data:
+        # Write succeeded but the server returned no representation (e.g. HTTP 204): read it back.
+        # If it still is not there, the write did not happen — fail loudly rather than fake a device.
+        found = first_row(db.table("devices").select("*").eq("user_id", uid).eq("device_id", body.device_id))
+        if not found:
+            raise HTTPException(status_code=502, detail="Device registration was not confirmed by the database")
+        return _to_out(found)
+    return _to_out(data[0])
 
 
 @router.get("", response_model=list[DeviceOut])
@@ -126,23 +123,16 @@ async def heartbeat(device_id: str, body: DeviceHeartbeatRequest, current: dict 
     """
     uid = current["sub"]
     db = get_supabase_admin()
-    existing = (
-        db.table("devices")
-        .select("id")
-        .eq("user_id", uid)
-        .eq("device_id", device_id)
-        .maybe_single()
-        .execute()
-    )
-    if not existing.data:
+    existing_row = first_row(db.table("devices").select("id").eq("user_id", uid).eq("device_id", device_id))
+    if not existing_row:
         raise HTTPException(status_code=404, detail="Device not registered")
 
     patch = {}
     if body.keyboard_active is not None:
         patch["keyboard_active"] = body.keyboard_active
     if not patch:
-        row = db.table("devices").select("*").eq("id", existing.data["id"]).single().execute()
+        row = db.table("devices").select("*").eq("id", existing_row["id"]).single().execute()
         return _to_out(row.data)
 
-    row = db.table("devices").update(patch).eq("id", existing.data["id"]).execute()
+    row = db.table("devices").update(patch).eq("id", existing_row["id"]).execute()
     return _to_out(row.data[0])

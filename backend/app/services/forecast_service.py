@@ -8,6 +8,7 @@ from pathlib import Path
 from datetime import datetime, date, timedelta
 from app.schemas.behavioral import ForecastResponse, DayForecast
 from app.services.data_days import count_data_days
+from app.core.db_retry import run as db_run, TRANSIENT_ERRORS, DatabaseUnavailable
 from app.services import global_forecast as gf
 import time
 
@@ -41,14 +42,30 @@ _PROFILE_TTL = 3600
 
 
 def _tier0_prior() -> dict[int, dict]:
-    """Trained Tier-0 weekday prior shipped in ml/models/saved/; {} if missing or unreadable."""
+    """Load the trained Tier-0 prior, with its validated values as a fallback."""
+    trained_prior = {
+        "0": 0.5193,
+        "1": 0.4753,
+        "2": 0.4365,
+        "3": 0.4463,
+        "4": 0.4470,
+        "5": 0.4125,
+        "6": 0.4603,
+    }
+
     try:
         import json
         from pathlib import Path
+
         f = Path(__file__).resolve().parents[2] / "ml" / "models" / "saved" / "tier0_prior.json"
-        return gf.prior_profile(json.loads(f.read_text()))
+        if f.is_file():
+            loaded = gf.prior_profile(json.loads(f.read_text()))
+            if loaded:
+                return loaded
     except Exception:
-        return {}
+        pass
+
+    return gf.prior_profile(trained_prior)
 
 
 def _population_profile(db) -> dict[int, dict]:
@@ -89,6 +106,8 @@ def _global_forecast(uid: str, db, basis: dict, days_left: int) -> ForecastRespo
         cal_rows = db.table("calendar_events").select("event_date,exam_flag,meeting_density,total_committed_hours").eq("user_id", uid).in_("event_date", wanted).execute().data or []
         cal = {r["event_date"]: r for r in cal_rows}
         days, cohort = gf.build_days(today, own_scores, _population_profile(db), cal)
+    except TRANSIENT_ERRORS as e:                 # database unreachable: say so (503), don't present "not ready" as the truth
+        raise DatabaseUnavailable(f"starter forecast reads failed: {type(e).__name__}") from e
     except Exception:
         days, cohort = [], 0
     if not days:
@@ -101,16 +120,21 @@ def _global_forecast(uid: str, db, basis: dict, days_left: int) -> ForecastRespo
 
 async def get_forecast_for_user(uid: str, db) -> ForecastResponse:
     # Check cold-start conditions
-    user = db.table("users").select("lstm_model_trained_at").eq("id", uid).execute()
+    # Reads are retried a few times on transient network errors (timeouts, resets). If the database
+    # stays unreachable, DatabaseUnavailable propagates and the endpoint answers 503 — no forecast
+    # is invented from data we could not read.
+    user = db_run(lambda: db.table("users").select("lstm_model_trained_at").eq("id", uid).execute(),
+                  what="forecast: user lookup")
     if not user.data:
         return ForecastResponse(model_ready=False, days_until_ready=DAYS_NEEDED)
 
     model_path = MODEL_DIR / f"{uid}.pt"
 
     # Count available data (exact — an un-paged select is capped at ~1000 rows ≈ 8 h and under-counts days)
-    days_of_data = count_data_days(db, uid)
+    days_of_data = db_run(lambda: count_data_days(db, uid), what="forecast: data-day count")
 
-    checkins = db.table("mood_checkins").select("id", count="exact").eq("user_id", uid).execute()
+    checkins = db_run(lambda: db.table("mood_checkins").select("id", count="exact").eq("user_id", uid).execute(),
+                      what="forecast: check-in count")
     checkins_count = checkins.count or 0
 
     basis = dict(days_of_data=days_of_data, checkins_count=checkins_count,

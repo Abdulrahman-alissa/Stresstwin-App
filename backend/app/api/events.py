@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from app.core.security import get_current_user
+from app.core.db_retry import first_row
 from app.core.database import get_supabase_admin
 from app.schemas.behavioral import (
     BatchRequest, ScoreResponse, ScoreHistoryItem,
@@ -21,16 +22,11 @@ async def submit_batch(body: BatchRequest, current: dict = Depends(get_current_u
     # Optional device linkage (legacy desktop clients may omit this).
     device_pk = None
     if feats.device_id:
-        device_row = (
-            db.table("devices")
-            .select("id")
-            .eq("user_id", uid)
-            .eq("device_id", feats.device_id)
-            .limit(1)
-            .execute()
+        device_row = first_row(
+            db.table("devices").select("id").eq("user_id", uid).eq("device_id", feats.device_id)
         )
-        if device_row.data:
-            device_pk = device_row.data[0]["id"]
+        if device_row:
+            device_pk = device_row["id"]
             now_iso = datetime.now(timezone.utc).isoformat()
             db.table("devices").update({
                 "last_snapshot_at": now_iso, "last_sync_at": now_iso,
@@ -99,17 +95,12 @@ async def submit_snapshot_batch(body: SnapshotBatchUploadRequest, current: dict 
     uid = current["sub"]
     db = get_supabase_admin()
 
-    device_row = (
-        db.table("devices")
-        .select("id")
-        .eq("user_id", uid)
-        .eq("device_id", body.device_id)
-        .limit(1)
-        .execute()
+    device_row = first_row(
+        db.table("devices").select("id").eq("user_id", uid).eq("device_id", body.device_id)
     )
-    if not device_row.data:
+    if not device_row:
         raise HTTPException(status_code=404, detail="Device not registered — call /api/devices/register first")
-    device_pk = device_row.data[0]["id"]
+    device_pk = device_row["id"]
 
     accepted, duplicates = 0, 0
     latest_window = None

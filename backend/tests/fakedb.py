@@ -17,6 +17,7 @@ class _Q:
     def neq(self, k, v): self.filters.append((k, "neq", v)); return self
     def gte(self, k, v): self.filters.append((k, "gte", v)); return self
     def lt(self, k, v): self.filters.append((k, "lt", v)); return self
+    def in_(self, k, vals): self.filters.append((k, "in", list(vals))); return self
     def order(self, col, desc=False): self.order_col = col; return self
     def range(self, a, b): self.rng = (a, b); return self
     def limit(self, n): self.rng = (0, n - 1); return self
@@ -27,6 +28,7 @@ class _Q:
             if x is None:                      # SQL: comparisons with NULL are never true
                 return False
             x, v = str(x) if op in ("gte", "lt") else x, str(v) if op in ("gte", "lt") else v
+            if op == "in" and x not in v: return False
             if op == "eq" and x != v: return False
             if op == "neq" and x == v: return False
             if op == "gte" and not x >= v: return False
