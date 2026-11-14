@@ -1,0 +1,417 @@
+{
+  "notes": [
+    "Model files hold only trained_at, n_samples_trained_on and source_counts: no validation metrics are stored. Metrics were printed by the training CLI / written to the model_versions DB table, which was not supplied."
+  ],
+  "leakage": {
+    "split_participant_overlap": [],
+    "split_sizes": {
+      "train_rows": 1053,
+      "val_rows": 217,
+      "train_participants": 38,
+      "val_participants": 10
+    },
+    "row_overlap": 0,
+    "label_or_derived_columns_in_features": [],
+    "preprocessing_inside_pipeline": [
+      "impute",
+      "scale",
+      "clf"
+    ],
+    "published_models_fit_on_all_rows": {
+      "n_trained_on": 1270,
+      "dataset_rows": 1270,
+      "held_out_rows_available": 0
+    },
+    "tier0_prior_fit_on_all_rows": true,
+    "cli_metrics_reproduced": {
+      "cli": {
+        "val_accuracy": 0.7189,
+        "val_precision": 0.0,
+        "val_recall": 0.0,
+        "val_auc": 0.5823,
+        "n_train": 1053,
+        "n_val": 217
+      },
+      "this_script": {
+        "val_accuracy": 0.7189,
+        "val_precision": 0.0,
+        "val_recall": 0.0,
+        "val_auc": 0.5823
+      },
+      "match": true
+    },
+    "demo_random_row_split_auc_mean(NOT_a_valid_estimate)": 0.5584,
+    "notes": [
+      "Participant-grouped split: train and validation participants are disjoint (overlap list is empty).",
+      "Imputer and scaler sit inside the sklearn Pipeline, so they are fitted on training rows only in the validation model.",
+      "Label columns (label_stress, label_risk_continuous) and calendar_observed are not model inputs.",
+      "The PUBLISHED v1/v2 models and the Tier 0 prior were fit on every row/participant, so no held-out data exists for them: any score of the published files on this CSV is TRAINING performance.",
+      "Model/feature/threshold choices were iterated in the repo (many *.before_* backups, docstring mentions comparing against GradientBoosting) using this same seed-42 validation split, so that single split is optimistic as an estimate of new-participant performance. The repeated grouped CV below is the fairer estimate, but the dataset was still used for design decisions.",
+      "Label and features come from the same calendar day (features are not from the future of the label). Days of one participant are strongly correlated, so splitting by row would leak: see the demo value above."
+    ]
+  },
+  "data": {
+    "tier1_rows": 1270,
+    "tier1_participants": 48,
+    "tier1_positive_rate": 0.3488,
+    "tier1_date_range": [
+      "2013-03-25",
+      "2013-08-15"
+    ],
+    "tier1_calendar_missing_rate": 0.7583,
+    "tier0_rows": 2157,
+    "tier0_participants": 48,
+    "tier0_date_range": [
+      "2013-03-25",
+      "2013-08-15"
+    ]
+  },
+  "stored_model_attrs": {
+    "v1": {
+      "trained_at": "2026-09-30T20:26:13.740499+00:00",
+      "n_samples_trained_on": 1270,
+      "source_counts": {
+        "studentlife": 1270
+      }
+    },
+    "v2": {
+      "trained_at": "2026-09-30T20:59:10.219503+00:00",
+      "n_samples_trained_on": 1270,
+      "source_counts": {
+        "studentlife": 1270
+      }
+    }
+  },
+  "stored_metrics_found": false,
+  "v1_vs_v2": {
+    "identical_coefficients_scaler_imputer": true,
+    "max_abs_prediction_diff": 0.0,
+    "trained_at": {
+      "v1": "2026-09-30T20:26:13.740499+00:00",
+      "v2": "2026-09-30T20:59:10.219503+00:00"
+    },
+    "n_trained_on": {
+      "v1": 1270,
+      "v2": 1270
+    }
+  },
+  "coefficients_standardised": {
+    "app_switch_rate": -0.1025,
+    "active_hours_norm": -0.0397,
+    "calendar_meeting_density": -0.057,
+    "calendar_earliest_start": 0.1087,
+    "calendar_consecutive_loaded_days": -0.1323,
+    "calendar_days_to_next_free": 0.0942
+  },
+  "tier1": {
+    "v1_published_TRAIN_insample": {
+      "accuracy": 0.6504,
+      "balanced_accuracy": 0.4994,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "brier": 0.2233,
+      "log_loss": 0.6384,
+      "roc_auc": 0.5739,
+      "pr_auc": 0.4145,
+      "brier_skill_vs_prevalence": 0.0169,
+      "confusion": {
+        "tn": 826,
+        "fp": 1,
+        "fn": 443,
+        "tp": 0
+      },
+      "n": 1270,
+      "prevalence": 0.3488
+    },
+    "v2_published_TRAIN_insample": {
+      "accuracy": 0.6504,
+      "balanced_accuracy": 0.4994,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "brier": 0.2233,
+      "log_loss": 0.6384,
+      "roc_auc": 0.5739,
+      "pr_auc": 0.4145,
+      "brier_skill_vs_prevalence": 0.0169,
+      "confusion": {
+        "tn": 826,
+        "fp": 1,
+        "fn": 443,
+        "tp": 0
+      },
+      "n": 1270,
+      "prevalence": 0.3488
+    },
+    "validation_model_seed42_HELD_OUT": {
+      "accuracy": 0.7189,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "brier": 0.2096,
+      "log_loss": 0.6113,
+      "roc_auc": 0.5823,
+      "pr_auc": 0.3436,
+      "brier_skill_vs_prevalence": -0.037,
+      "confusion": {
+        "tn": 156,
+        "fp": 0,
+        "fn": 61,
+        "tp": 0
+      },
+      "n": 217,
+      "prevalence": 0.2811
+    },
+    "validation_model_seed42_majority_baseline": {
+      "accuracy": 0.7189,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "brier": 0.2088,
+      "log_loss": 0.609,
+      "roc_auc": 0.5,
+      "pr_auc": 0.2811,
+      "brier_skill_vs_prevalence": -0.033,
+      "confusion": {
+        "tn": 156,
+        "fp": 0,
+        "fn": 61,
+        "tp": 0
+      },
+      "n": 217,
+      "prevalence": 0.2811
+    },
+    "validation_model_seed42_TRAIN_insample": {
+      "accuracy": 0.6382,
+      "balanced_accuracy": 0.5081,
+      "precision": 0.52,
+      "recall": 0.034,
+      "f1": 0.0639,
+      "brier": 0.2266,
+      "log_loss": 0.6452,
+      "roc_auc": 0.5729,
+      "pr_auc": 0.4217,
+      "brier_skill_vs_prevalence": 0.0197,
+      "confusion": {
+        "tn": 659,
+        "fp": 12,
+        "fn": 369,
+        "tp": 13
+      },
+      "n": 1053,
+      "prevalence": 0.3628
+    },
+    "repeated_grouped_holdout_200x_HELD_OUT": {
+      "accuracy": {
+        "mean": 0.6582,
+        "sd": 0.0724
+      },
+      "balanced_accuracy": {
+        "mean": 0.5017,
+        "sd": 0.0101
+      },
+      "precision": {
+        "mean": 0.1847,
+        "sd": 0.2725
+      },
+      "recall": {
+        "mean": 0.0195,
+        "sd": 0.0319
+      },
+      "f1": {
+        "mean": 0.0327,
+        "sd": 0.0498
+      },
+      "brier": {
+        "mean": 0.2277,
+        "sd": 0.0224
+      },
+      "log_loss": {
+        "mean": 0.6521,
+        "sd": 0.0521
+      },
+      "roc_auc": {
+        "mean": 0.546,
+        "sd": 0.0419
+      },
+      "pr_auc": {
+        "mean": 0.3835,
+        "sd": 0.0824
+      },
+      "brier_skill_vs_prevalence": {
+        "mean": -0.0528,
+        "sd": 0.0703
+      },
+      "prevalence": {
+        "mean": 0.3358,
+        "sd": 0.0756
+      }
+    },
+    "repeated_grouped_holdout_200x_majority_baseline": {
+      "accuracy_mean": 0.6642,
+      "brier_mean": 0.2266
+    },
+    "repeated_grouped_holdout_200x_auc_gt_0.5_share": 0.875,
+    "oof_8fold_grouped_HELD_OUT": {
+      "accuracy": 0.6441,
+      "balanced_accuracy": 0.4977,
+      "precision": 0.2857,
+      "recall": 0.0135,
+      "f1": 0.0259,
+      "brier": 0.2331,
+      "log_loss": 0.6632,
+      "roc_auc": 0.4501,
+      "pr_auc": 0.3242,
+      "brier_skill_vs_prevalence": -0.0264,
+      "confusion": {
+        "tn": 812,
+        "fp": 15,
+        "fn": 437,
+        "tp": 6
+      },
+      "n": 1270,
+      "prevalence": 0.3488,
+      "spearman_with_label_risk_continuous": -0.0791,
+      "roc_auc_95ci_participant_bootstrap": [
+        0.3999,
+        0.5033
+      ],
+      "share_of_predictions_ge_0.5": 0.0165,
+      "prediction_range": [
+        0.022,
+        0.581
+      ]
+    }
+  },
+  "tier0_prior_reproduced_from_csv": {
+    "published": {
+      "0": 0.5193,
+      "1": 0.4753,
+      "2": 0.4365,
+      "3": 0.4463,
+      "4": 0.447,
+      "5": 0.4125,
+      "6": 0.4603
+    },
+    "recomputed": {
+      "0": 0.5193,
+      "1": 0.4753,
+      "2": 0.4365,
+      "3": 0.4463,
+      "4": 0.447,
+      "5": 0.4125,
+      "6": 0.4603
+    },
+    "match": true,
+    "v3_file_equals_current": true
+  },
+  "tier0": {
+    "published_prior_TRAIN_insample_responses": {
+      "mae": 0.2097,
+      "rmse": 0.2689,
+      "r2": 0.0117,
+      "n": 2157
+    },
+    "flat_global_mean_TRAIN_insample_responses": {
+      "mae": 0.212,
+      "rmse": 0.2705,
+      "r2": 0.0,
+      "n": 2157
+    },
+    "published_prior_TRAIN_insample_participant_days": {
+      "mae": 0.2045,
+      "rmse": 0.2604,
+      "r2": 0.0107,
+      "n": 1270
+    },
+    "flat_global_mean_TRAIN_insample_participant_days": {
+      "mae": 0.2122,
+      "rmse": 0.2618,
+      "r2": 0.0,
+      "n": 1270
+    },
+    "repeated_grouped_holdout_500x_HELD_OUT_responses": {
+      "prior_mae": {
+        "mean": 0.2142,
+        "sd": 0.0199
+      },
+      "prior_rmse": {
+        "mean": 0.2738,
+        "sd": 0.0241
+      },
+      "prior_r2": {
+        "mean": -0.0507,
+        "sd": 0.0782
+      },
+      "flat_mae": {
+        "mean": 0.2156,
+        "sd": 0.0197
+      },
+      "flat_rmse": {
+        "mean": 0.2744,
+        "sd": 0.0241
+      },
+      "flat_r2": {
+        "mean": -0.0546,
+        "sd": 0.0729
+      },
+      "prior_beats_flat_rmse": {
+        "mean": 0.642,
+        "sd": 0.4799
+      }
+    },
+    "oof_8fold_grouped_HELD_OUT_responses": {
+      "prior": {
+        "mae": 0.2127,
+        "rmse": 0.2725,
+        "r2": -0.0149,
+        "n": 2157
+      },
+      "flat_mean": {
+        "mae": 0.214,
+        "rmse": 0.2729,
+        "r2": -0.0179,
+        "n": 2157
+      }
+    },
+    "oof_8fold_grouped_HELD_OUT_binary_view": {
+      "threshold": 0.5,
+      "prevalence": 0.2842,
+      "roc_auc_of_prior_as_score": 0.4817,
+      "accuracy_at_0.5": 0.6847,
+      "share_predicted_stressed": 0.1275
+    },
+    "weekday_effect_permutation_test": {
+      "observed_variance_of_weekday_means": 0.000977,
+      "perm_p_value": 0.0005,
+      "weekday_means": {
+        "0": 0.5193,
+        "1": 0.4753,
+        "2": 0.4365,
+        "3": 0.4463,
+        "4": 0.447,
+        "5": 0.4125,
+        "6": 0.4603
+      },
+      "weekday_n": {
+        "0": 275,
+        "1": 360,
+        "2": 375,
+        "3": 350,
+        "4": 319,
+        "5": 216,
+        "6": 262
+      },
+      "range_of_weekday_means": 0.1068
+    },
+    "leave_one_participant_out_participant_weekday_means_HELD_OUT": {
+      "mae": 0.1505,
+      "rmse": 0.1884,
+      "r2": 0.0054,
+      "n": 314
+    }
+  }
+}

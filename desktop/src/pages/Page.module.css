@@ -1,0 +1,94 @@
+.page {
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 16px;
+  min-height: 100vh;
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.pageHeader { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 4px; }
+.pageTitle  { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+.pageSub    { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+.card {
+  background: var(--surface); border-radius: var(--r);
+  border: 0.5px solid var(--border); overflow: hidden;
+  animation: fadeIn .4s ease both;
+}
+
+.emptyCard {
+  background: var(--surface); border-radius: var(--r);
+  border: 0.5px solid var(--border); padding: 48px 24px;
+  text-align: center;
+}
+.emptyTitle { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.emptySub   { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 420px; margin: 0 auto; }
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 80px; }
+
+.flash {
+  padding: 10px 14px; border-radius: 9px;
+  background: var(--surface); border: 0.5px solid var(--brand);
+  font-size: 13px; color: var(--text);
+}
+
+.refreshBtn {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  padding: 8px 14px; border-radius: 8px;
+  background: var(--surface); border: 0.5px solid var(--border2);
+  color: var(--muted); cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.refreshBtn:hover { color: var(--text); border-color: var(--brand); }
+.refreshBtn:disabled { opacity: .5; }
+
+.dayBtn { font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 7px; border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); cursor: pointer; }
+.dayBtnActive { background: var(--brand-dim); color: var(--brand); border-color: rgba(59,91,219,.2); }
+
+/* Forecast page cards */
+.fcRow { display: flex; align-items: center; gap: 16px; }
+.fcLeft { flex: 1; }
+.fcRight{ width: 180px; flex-shrink: 0; }
+.fcDate { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.fcRiskRow { display: flex; align-items: center; gap: 8px; }
+.fcRiskPct   { font-family: var(--mono); font-size: 20px; font-weight: 300; letter-spacing: -0.02em; }
+.fcRiskBadge { font-family: var(--mono); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+.fcBar  { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.fcFill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.fcStressor { font-size: 11px; color: var(--amber); margin-top: 8px; }
+.fcRec      { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* Settings */
+.section { display: flex; flex-direction: column; gap: 8px; }
+.sectionTitle { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); }
+
+.field  { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.label  { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hint); }
+.input  { width: 100%; padding: 10px 12px; background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 13px; outline: none; transition: border-color .15s; }
+.input:focus { border-color: var(--brand); }
+
+.slider { width: 100%; accent-color: var(--brand); }
+.sliderHint { font-size: 11px; color: var(--hint); font-family: var(--mono); }
+
+.saveBtn { padding: 10px 20px; background: var(--brand); color: #fff; border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+.saveBtn:hover { opacity: .88; }
+.saveBtn:disabled { opacity: .5; }
+
+.calRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--surface2); border-radius: 10px; border: 0.5px solid var(--border); }
+.calInfo { display: flex; align-items: center; gap: 10px; }
+.calIcon { font-size: 22px; }
+.calName { font-size: 13px; font-weight: 500; }
+.calStatus { font-size: 11px; margin-top: 2px; font-family: var(--mono); }
+.calBtn        { padding: 7px 14px; border-radius: 7px; border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; }
+.calBtnPrimary { padding: 7px 14px; border-radius: 7px; border: none; background: var(--brand); color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; }
+.calBtnDanger  { padding: 7px 14px; border-radius: 7px; border: 0.5px solid var(--red-dim); background: var(--red-dim); color: var(--red); font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; }
+
+.privacyNote { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.statsRow { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat { flex: 1; min-width: 80px; background: var(--surface2); border-radius: 8px; padding: 12px; text-align: center; border: 0.5px solid var(--border); }
+.statVal { font-family: var(--mono); font-size: 20px; font-weight: 300; color: var(--brand); }
+.statLbl { font-family: var(--mono); font-size: 10px; color: var(--hint); margin-top: 3px; }
+
+.signOutBtn { padding: 10px 20px; background: var(--surface2); border: 0.5px solid var(--border2); color: var(--muted); border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; }
+.deleteBtn  { padding: 10px 20px; background: var(--red-dim); border: 0.5px solid rgba(240,62,62,.25); color: var(--red); border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; }
+.deleteConfirmBtn { padding: 10px 20px; background: var(--red); border: none; color: #fff; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; }

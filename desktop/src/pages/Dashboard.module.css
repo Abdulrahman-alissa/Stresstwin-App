@@ -1,0 +1,83 @@
+.root {
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 14px;
+  min-height: 100vh;
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 4px; }
+.title  { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+.sub    { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.headerRight { display: flex; gap: 8px; align-items: center; }
+.pill {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border2);
+  display: flex; align-items: center; gap: 6px;
+}
+.liveDot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulseDot 2s ease infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* Grid rows */
+.row3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.row23 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+
+/* Card base */
+.card {
+  background: var(--surface);
+  border-radius: var(--r); border: 0.5px solid var(--border);
+  padding: 18px; position: relative; overflow: hidden;
+}
+.darkCard { background: #0D1017; border-color: #1A1D28; }
+.clbl {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); margin-bottom: 12px;
+}
+
+/* Score card */
+.scoreCard { display: flex; flex-direction: column; align-items: center; }
+.scoreLabel { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-top: 8px; }
+.coldStart { width: 100%; margin-top: 12px; }
+.coldStart { font-size: 11px; color: var(--muted); text-align: center; }
+.coldBar  { margin-top: 6px; height: 2px; background: var(--surface3); border-radius: 1px; overflow: hidden; }
+.coldFill { height: 100%; background: var(--brand); border-radius: 1px; transition: width .5s; }
+
+/* Mood check-in */
+.checkinPrompt { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.stars { display: flex; gap: 6px; }
+.star  { font-size: 24px; background: none; border: none; cursor: pointer; transition: transform .15s; padding: 2px; }
+.star:hover { transform: scale(1.2); }
+.checkinHint { font-size: 10px; color: var(--hint); margin-top: 6px; font-family: var(--mono); }
+.checkinProgress { margin-top: 14px; }
+.checkinDone { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+
+/* Flux */
+.fluxLegend { display: flex; gap: 12px; margin-bottom: 14px; }
+.legItem { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.legDot  { width: 6px; height: 6px; border-radius: 50%; }
+.fluxRows { display: flex; flex-direction: column; gap: 12px; }
+.fluxRow  { display: flex; align-items: center; gap: 10px; }
+.fluxName { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 72px; flex-shrink: 0; }
+.fluxTrack{ flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.fluxFill { height: 100%; border-radius: 2px; transition: width .5s ease; }
+.fluxVal  { font-family: var(--mono); font-size: 11px; font-weight: 600; width: 36px; text-align: right; }
+
+/* Interventions */
+.ivList { display: flex; flex-direction: column; gap: 10px; }
+.ivItem {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border-radius: 10px;
+  background: #12151F; border: 0.5px solid #1E2230;
+  opacity: 0.5; transition: opacity .2s;
+}
+.ivItem.ivActive { opacity: 1; border-color: rgba(59,91,219,.3); }
+.ivIcon  { font-size: 18px; }
+.ivPhase { font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--brand); }
+.ivText  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.ivDot   { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-left: auto; flex-shrink: 0; animation: pulseDot 2s ease infinite; }
+
+/* Live signals row */
+.rowHead { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.link { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: var(--brand); font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }

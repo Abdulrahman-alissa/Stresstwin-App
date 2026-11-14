@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "StressTwin",
+    "slug": "stresstwin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "scheme": "stresstwin",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.stresstwin.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "StressTwin uses motion sensors to detect stress-related behavioral patterns.",
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.stresstwin.app.shared"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.stresstwin.app",
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "USE_EXACT_ALARM",
+        "SCHEDULE_EXACT_ALARM"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "./plugins/withStressTwinKeyboardAndroid",
+      "./plugins/withStressTwinKeyboardIOS",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#3B5BDB",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "StressTwin uses motion data to detect stress-related behavioral changes."
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      },
+      "apiBaseUrl": "http://localhost:8000"
+    }
+  }
+}

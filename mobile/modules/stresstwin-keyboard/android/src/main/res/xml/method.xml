@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Declares StressTwin Keyboard's input-method subtypes to Android.
+  imeSubtypeMode="keyboard" with a generic locale keeps this usable as a
+  QWERTY-style keyboard across locales; extend with per-language subtypes
+  if StressTwin ships more than a basic layout.
+-->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="expo.modules.stresstwinkeyboard.StressTwinKeyboardSettingsActivity">
+    <subtype
+        android:label="@string/keyboard_subtype_label"
+        android:imeSubtypeLocale="en_US"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true" />
+</input-method>

@@ -1,0 +1,96 @@
+{
+  "name": "stresstwin-desktop",
+  "version": "1.0.0",
+  "description": "StressTwin — AI Behavioral Stress Monitor",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "cross-env ELECTRON=true vite build && electron-builder",
+    "build:win": "cross-env ELECTRON=true vite build && electron-builder --win",
+    "build:mac": "cross-env ELECTRON=true vite build && electron-builder --mac",
+    "preview": "vite preview"
+  },
+  "build": {
+    "appId": "com.stresstwin.app",
+    "productName": "StressTwin",
+    "copyright": "Copyright © 2025 StressTwin",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "output": "dist-electron"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "public/icon.icns",
+      "category": "public.app-category.productivity",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico"
+    },
+    "protocols": [
+      {
+        "name": "StressTwin",
+        "schemes": [
+          "stresstwin"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.383.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.4.5",
+    "uiohook-napi": "^1.5.3",
+    "vite": "^5.2.13",
+    "wait-on": "^7.2.0"
+  },
+  "allowScripts": {
+    "electron@31.0.0": true
+  }
+}

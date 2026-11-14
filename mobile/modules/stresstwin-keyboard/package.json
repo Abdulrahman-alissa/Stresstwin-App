@@ -1,0 +1,12 @@
+{
+  "name": "stresstwin-keyboard",
+  "version": "1.0.0",
+  "description": "StressTwin native keyboard bridge (Android IME + iOS Custom Keyboard Extension) \u2014 behavioral typing statistics only, no text content.",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "UNLICENSED",
+  "private": true,
+  "peerDependencies": {
+    "expo": "*"
+  }
+}

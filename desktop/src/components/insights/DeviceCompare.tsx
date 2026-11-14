@@ -1,0 +1,130 @@
+import { useCallback, useEffect, useState } from 'react'
+import { Monitor, Smartphone, Users } from 'lucide-react'
+import { getDeviceStats } from '../../api/client'
+import { getOrCreateDeviceId } from '../../api/deviceId'
+import { METRIC_META, deltaPct, fmtMetric, fmtMinutes, type DeviceStatsResponse } from '../../lib/deviceStats'
+import s from './insights.module.css'
+
+const RANGES = [{ h: 1, l: '1 h' }, { h: 24, l: '24 h' }, { h: 168, l: '7 d' }]
+const DOT = { sending: 'var(--accent)', stale: 'var(--amber)', inactive: 'var(--hint)' } as const
+
+function ago(iso: string | null) {
+  if (!iso) return 'never'
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m} min ago`
+  if (m < 1440) return `${Math.round(m / 60)} h ago`
+  return `${Math.round(m / 1440)} d ago`
+}
+
+export default function DeviceCompare() {
+  const [hours, setHours] = useState(24)
+  const [data, setData] = useState<DeviceStatsResponse | null>(null)
+  const [err, setErr] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const me = getOrCreateDeviceId()
+
+  const load = useCallback(async () => {
+    try { setData(await getDeviceStats(hours)); setErr(false) }
+    catch { setErr(true) }
+    finally { setLoading(false) }
+  }, [hours])
+
+  useEffect(() => {
+    setLoading(true); load()
+    const t = setInterval(load, 30_000)
+    return () => clearInterval(t)
+  }, [load])
+
+  const uniqueDevices = data?.devices
+    ? Array.from(
+        new Map(data.devices.map(d => [d.device_id, d])).values()
+      )
+    : []
+
+  const mine = uniqueDevices.find(d => d.device_id === me)
+  const avg = data?.average
+  const others = Math.max(0, uniqueDevices.length - (mine ? 1 : 0))
+  const rows = METRIC_META.filter(m => mine?.metrics[m.key] != null || avg?.metrics[m.key] != null)
+
+  return (
+    <div className={s.card}>
+      <div className={s.cardHead}>
+        <div>
+          <div className={s.clbl}>This device vs all devices</div>
+          <div className={s.csub}>
+            What this device collected, next to the average of every device that is sending data. Each device counts once, so a busy laptop can't drown out a phone.
+          </div>
+        </div>
+        <div className={s.seg}>
+          {RANGES.map(r => (
+            <button key={r.h} className={hours === r.h ? s.segOn : ''} onClick={() => setHours(r.h)}>{r.l}</button>
+          ))}
+        </div>
+      </div>
+
+      {loading && !data ? <div className={s.dcEmpty}>Loading…</div>
+      : err && !data ? (
+        <div className={s.dcEmpty}>Couldn't reach the server. <button className={s.dcLink} onClick={load}>Retry</button></div>
+      ) : !data || data.devices.length === 0 ? (
+        <div className={s.dcEmpty}>No device has sent data in this period yet. Type for a minute and check back — this device syncs every 30 seconds.</div>
+      ) : (
+        <>
+          {err && <div className={s.dcWarn}>Showing the last result — refresh failed. <button className={s.dcLink} onClick={load}>Retry</button></div>}
+
+          <div className={s.dcHeadRow}>
+            <div className={s.dcBox} data-me>
+              <div className={s.dcWho}><Monitor size={13} /> This device</div>
+              <div className={s.dcBig}>{mine?.mean_score != null ? Math.round(mine.mean_score) : '—'}</div>
+              <div className={s.dcSmall}>avg stress index · {mine ? `${mine.windows} windows · ${fmtMinutes(mine.active_minutes)}` : 'no data in this period'}</div>
+            </div>
+            <div className={s.dcBox}>
+              <div className={s.dcWho}><Users size={13} /> All devices (average)</div>
+              <div className={s.dcBig}>{avg?.mean_score != null ? Math.round(avg.mean_score) : '—'}</div>
+              <div className={s.dcSmall}>avg stress index · {avg?.devices_counted ?? 0} device{avg?.devices_counted === 1 ? '' : 's'}</div>
+            </div>
+          </div>
+
+          {!mine && <div className={s.dcWarn}>This device hasn't sent data in the last {RANGES.find(r => r.h === hours)?.l}. Showing the other devices only.</div>}
+          {mine && others === 0 && <div className={s.dcWarn}>Only this device is sending data right now, so the average is the same as this device. Sign in on your phone to compare.</div>}
+
+          <table className={s.dcTable}>
+            <thead><tr><th>Signal</th><th>This device</th><th>All-device avg</th><th>Difference</th></tr></thead>
+            <tbody>
+              {rows.map(m => {
+                const a = avg?.metrics[m.key] ?? null
+                const v = mine?.metrics[m.key] ?? null
+                const d = m.kind === 'count' ? null : deltaPct(v, a)
+                const n = avg?.devices_reporting[m.key] ?? 0
+                const hot = d != null && Math.abs(d) >= 25 && (avg?.devices_counted ?? 0) > 1
+                return (
+                  <tr key={m.key}>
+                    <td>{m.label}<span className={s.dcN}>{n} device{n === 1 ? '' : 's'}</span></td>
+                    <td className={s.dcNum}>{fmtMetric(v, m)}</td>
+                    <td className={s.dcNum}>{fmtMetric(a, m)}</td>
+                    <td className={s.dcNum} style={{ color: hot ? 'var(--amber)' : 'var(--hint)' }}>
+                      {d == null ? '—' : `${d > 0 ? '+' : ''}${Math.round(d)}%`}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          <div className={s.dcList}>
+            {uniqueDevices.map(d => (
+              <div key={d.device_id} className={s.dcDev}>
+                <span className={s.dcDot} style={{ background: DOT[d.status] }} />
+                {d.platform === 'desktop' ? <Monitor size={13} /> : <Smartphone size={13} />}
+                <span className={s.dcName}>{d.display_name}{d.device_id === me && <em> · this device</em>}</span>
+                <span className={s.dcMeta}>{d.windows} windows · last data {ago(d.last_snapshot_at)}</span>
+                <span className={s.dcScore}>{d.mean_score != null ? Math.round(d.mean_score) : '—'}</span>
+              </div>
+            ))}
+          </div>
+          <div className={s.note} style={{ marginTop: 10 }}>Averages are counts and timings only. A signal is averaged over the devices that measure it (phones have no mouse).</div>
+        </>
+      )}
+    </div>
+  )
+}

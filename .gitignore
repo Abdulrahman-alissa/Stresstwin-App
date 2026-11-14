@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+.expo/
+.gradle/

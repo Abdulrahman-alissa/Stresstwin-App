@@ -1,0 +1,32 @@
+.card {
+  background: var(--surface);
+  border-radius: 18px;
+  border: 0.5px solid var(--border);
+  padding: 18px;
+}
+.clbl {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--hint);
+  margin-bottom: 12px;
+}
+.empty { font-size: 13px; color: var(--hint); }
+.row {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.icon { font-size: 20px; }
+.meta { flex: 1; }
+.name { font-size: 13px; font-weight: 500; color: var(--text); }
+.sub { font-family: monospace; font-size: 11px; color: var(--hint); margin-top: 2px; }
+.summary {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  padding-top: 10px;
+}
