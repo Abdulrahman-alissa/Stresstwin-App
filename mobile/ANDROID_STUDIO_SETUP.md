@@ -166,7 +166,3 @@ keyboard app:
   in-app status flips to 🟢 Enabled
 - The phone shows up under **My Devices** on the dashboard after the next
   sync
-
-If you get through all of that, the same build is what `eas build` would
-produce for distribution — see the earlier hosting notes for turning this
-into something you can share without everyone needing Android Studio.
