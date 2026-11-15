@@ -173,10 +173,3 @@ it's why the App Group entitlement has to match exactly on both targets.
   (step 7) ✔
 - Typing in another app, then reopening StressTwin, eventually shows the
   device under **My Devices** on the dashboard after a sync cycle
-
-I can't verify any of the Xcode-specific steps by actually running Xcode in
-this environment — there's no macOS/Xcode available here, only Linux with
-Node — so §6–8 are written from the underlying Swift code and Apple's
-documented extension model, not from having clicked through this myself.
-If Xcode's UI has moved since (Apple does this periodically), the target
-names and menu paths are the most likely thing to drift.
